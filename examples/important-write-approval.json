@@ -1,0 +1,6 @@
+{
+  "message": "This app wants to remember a preference.",
+  "requires_approval": true,
+  "actions": ["accept", "edit", "reject"],
+  "visibility": "private"
+}

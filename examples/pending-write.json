@@ -1,0 +1,6 @@
+{
+  "title": "This app wants to remember a reading preference",
+  "status": "pending",
+  "actions": ["accept", "edit", "reject"],
+  "default_visibility": "private"
+}

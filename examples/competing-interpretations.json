@@ -1,0 +1,15 @@
+{
+  "entry": "Prefers concise summaries",
+  "competing_interpretations": [
+    {
+      "title": "May prefer concise summaries only for long articles",
+      "reason": "The signal appears mainly on long articles.",
+      "confidence": 0.56
+    },
+    {
+      "title": "May prefer key points before deep dives",
+      "reason": "The user expands summaries before reading detail.",
+      "confidence": 0.61
+    }
+  ]
+}

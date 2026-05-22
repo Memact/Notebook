@@ -1,0 +1,7 @@
+{
+  "title": "Another source disagrees.",
+  "source": "Connected app",
+  "reason": "A different approved source produced a different reading pattern.",
+  "confidence": 0.67,
+  "resolved": false
+}

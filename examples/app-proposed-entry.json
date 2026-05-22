@@ -1,0 +1,44 @@
+{
+  "entry_id": "wiki_entry_002",
+  "user_id": "user_123",
+  "title": "Prefers concise summaries",
+  "category": "reading",
+  "value": {
+    "preferred_summary_style": "concise"
+  },
+  "source_type": "app",
+  "sources": [
+    {
+      "type": "app",
+      "app_id": "article_app_demo",
+      "name": "ArticleApp",
+      "confidence": 0.72,
+      "evidence": ["low average read time", "summary_expand events"]
+    }
+  ],
+  "confidence": 0.72,
+  "user_verified": false,
+  "visibility": "private",
+  "status": "pending",
+  "importance": "important",
+  "requires_approval": true,
+  "competing_interpretations": [
+    {
+      "title": "Prefers concise summaries only for long articles",
+      "reason": "The user expands summaries mainly on long articles.",
+      "confidence": 0.56
+    }
+  ],
+  "contradictions": [
+    {
+      "title": "Usually reads long explainers fully",
+      "source": "ResearchApp",
+      "reason": "High finish rate on long AI policy articles.",
+      "confidence": 0.67
+    }
+  ],
+  "resolution": null,
+  "expires_at": null,
+  "created_at": "2026-05-22T00:00:00.000Z",
+  "updated_at": "2026-05-22T00:00:00.000Z"
+}
