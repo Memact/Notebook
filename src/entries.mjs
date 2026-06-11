@@ -1,4 +1,4 @@
-const SOURCE_TYPES = new Set(["user", "app", "memact", "memact_feature"])
+const SOURCE_TYPES = new Set(["user", "app", "memact", "playground_feature"])
 const STATUSES = new Set(["draft", "pending", "accepted", "edited", "rejected", "expired", "deleted", "contradicted", "resolved"])
 const VISIBILITIES = new Set(["private", "shareable", "public"])
 const IMPORTANCE = new Set(["low", "normal", "important"])
@@ -30,12 +30,8 @@ export function proposeMemactEntry(input = {}) {
   return createProposedEntry({ ...input, source_type: "memact" })
 }
 
-export function proposeMemactFeatureEntry(input = {}) {
-  return createProposedEntry({ ...input, source_type: "memact_feature" })
-}
-
 export function proposePlaygroundEntry(input = {}) {
-  return proposeMemactFeatureEntry(input)
+  return createProposedEntry({ ...input, source_type: "playground_feature" })
 }
 
 export function acceptEntry(entry, options = {}) {
@@ -175,7 +171,7 @@ export function explainWhyEntryExists(entry) {
   if (!source) return "This entry exists because it was added to your Wiki."
   if (entry.source_type === "user") return "You added this memory."
   if (entry.source_type === "app") return `${source.name || "An app"} proposed this memory from allowed activity.`
-  if (entry.source_type === "memact_feature") return `${source.name || "A Memact feature"} proposed this memory.`
+  if (entry.source_type === "playground_feature") return `${source.name || "A Playground feature"} proposed this memory.`
   return "Memact created this memory from allowed activity."
 }
 
@@ -264,7 +260,6 @@ function normalizeSources(sources, sourceType) {
 
 function normalizeSourceType(value) {
   const clean = String(value || "").trim()
-  if (clean === "playground_feature") return "memact_feature"
   return SOURCE_TYPES.has(clean) ? clean : "memact"
 }
 
@@ -298,7 +293,7 @@ function requiredText(value, field) {
 function sourceLabel(sourceType) {
   if (sourceType === "user") return "You"
   if (sourceType === "app") return "Connected app"
-  if (sourceType === "memact_feature") return "Memact feature"
+  if (sourceType === "playground_feature") return "Playground feature"
   return "Memact"
 }
 

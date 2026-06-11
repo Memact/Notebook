@@ -4,7 +4,7 @@ Memact Wiki is the user-controlled memory surface for Memact.
 
 Consent asks before access. Wiki shows what exists after access.
 
-Wiki entries can be added by the user, proposed by apps, proposed by Memact features, or created by Memact from approved activity. Users can accept, edit, reject, delete, or share entries.
+Wiki entries can be added by the user, proposed by apps, proposed by Playground features, or created by Memact from approved activity. Users can accept, edit, reject, delete, or share entries.
 
 The default visibility is private.
 
@@ -28,11 +28,11 @@ The default visibility is private.
 - `user`: manually added by the user.
 - `app`: proposed by a connected app.
 - `memact`: created by Memact from approved activity.
-- `memact_feature`: proposed by a Memact feature.
+- `playground_feature`: proposed by a Playground feature.
 
 User-added entries are stronger than app-proposed entries by default. They start as accepted, private, verified memory.
 
-App, Memact, and Memact feature proposals usually start as pending. Important writes need approval before they become accepted memory.
+App, Memact, and Playground proposals usually start as pending. Important writes need approval before they become accepted memory.
 
 ## Development
 
