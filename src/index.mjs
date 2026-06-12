@@ -11,6 +11,7 @@ export {
   markExpired,
   proposeAppEntry,
   proposeMemactEntry,
+  proposeMemactFeatureEntry,
   proposePlaygroundEntry,
   rejectEntry,
   resolveContradiction,
