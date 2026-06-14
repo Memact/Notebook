@@ -1,10 +1,10 @@
 {
-  "name": "@memact/wiki",
+  "name": "@memact/notebook",
   "version": "0.0.1",
   "private": false,
   "license": "BUSL-1.1",
   "type": "module",
-  "description": "User-controlled memory surface for Memact Wiki entries, proposals, visibility, and governance.",
+  "description": "User-controlled memory surface for Memact Notebook entries, suggestions, visibility, and governance.",
   "scripts": {
     "check": "npm test",
     "test": "node --test"

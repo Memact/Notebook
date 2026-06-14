@@ -1,14 +1,14 @@
-# Memact Wiki
+# Memact Notebook
 
-Memact Wiki is the user-controlled memory surface for Memact.
+Memact Notebook is the user-controlled memory surface for Memact.
 
-Consent asks before access. Wiki shows what exists after access.
+Consent asks before access. Notebook shows what exists after access.
 
-Wiki entries can be added by the user, proposed by apps, proposed by Memact features, or created by Memact from approved activity. Users can accept, edit, reject, delete, or share entries.
+Notebook entries can be added by the user, proposed by apps, proposed by Memact features, or created by Memact from approved activity. Users can accept, edit, reject, delete, or share entries.
 
 The default visibility is private.
 
-## What Wiki Entries Support
+## What Notebook Entries Support
 
 - Source trails
 - App attribution

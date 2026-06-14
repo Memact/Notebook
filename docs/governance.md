@@ -1,6 +1,6 @@
 # Governance
 
-Memact Wiki governance is intentionally small:
+Memact Notebook governance is intentionally small:
 
 - Show provenance.
 - Keep source trails.

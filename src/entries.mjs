@@ -172,7 +172,7 @@ export function filterPublicEntries(entries = []) {
 
 export function explainWhyEntryExists(entry) {
   const source = entry.sources?.[0]
-  if (!source) return "This entry exists because it was added to your Wiki."
+  if (!source) return "This entry exists because it was added to your Notebook."
   if (entry.source_type === "user") return "You added this memory."
   if (entry.source_type === "app") return `${source.name || "An app"} proposed this memory from allowed activity.`
   if (entry.source_type === "memact_feature") return `${source.name || "A Memact feature"} proposed this memory.`
@@ -205,7 +205,7 @@ function createEntry(input = {}) {
   const createdAt = now(input.now)
   const sourceType = normalizeSourceType(input.source_type)
   return {
-    entry_id: input.entry_id || id("wiki_entry"),
+    entry_id: input.entry_id || id("notebook_entry"),
     user_id: String(input.user_id || "").trim(),
     title: requiredText(input.title, "title"),
     category: String(input.category || "other").trim().toLowerCase(),
