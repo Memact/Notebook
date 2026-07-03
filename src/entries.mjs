@@ -170,6 +170,23 @@ export function filterPublicEntries(entries = []) {
   }))
 }
 
+export function getInboxStats(entries = []) {
+  const stats = {
+    pending: 0,
+    junk: 0,
+    approved: 0,
+    total: entries.length
+  }
+
+  for (const entry of entries) {
+    if (entry.status === "pending") stats.pending += 1
+    else if (entry.status === "rejected" || entry.status === "expired") stats.junk += 1
+    else if (["accepted", "edited", "resolved"].includes(entry.status)) stats.approved += 1
+  }
+
+  return stats
+}
+
 export function explainWhyEntryExists(entry) {
   const source = entry.sources?.[0]
   if (!source) return "This entry exists because it was added to your Notebook."
