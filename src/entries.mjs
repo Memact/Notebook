@@ -348,6 +348,46 @@ function id(prefix) {
 function now(customNow) {
   return customNow ? new Date(customNow).toISOString() : new Date().toISOString()
 }
+
+export function generateAmbiguityResolutionPrompt(ambiguousTerm, suggestedMeanings = []) {
+  if (!ambiguousTerm || typeof ambiguousTerm !== "string" || !ambiguousTerm.trim()) {
+    throw new Error("An ambiguous term is required to generate a resolution wizard path");
+  }
+
+  const cleanTerm = ambiguousTerm.trim();
+  
+  // Format options for user clarity in the interface selection wizard
+  const resolutionOptions = suggestedMeanings.map((meaning, index) => ({
+    optionId: `split_opt_${index}_${Math.random().toString(36).slice(2, 6)}`,
+    meaningDefinition: meaning.definition || "No definition provided",
+    contextCategory: meaning.category || "other",
+    actionPayload: {
+      splitRequired: true,
+      refinedTitle: `${cleanTerm} (${meaning.category || "refined"})`,
+      suggestedCategory: meaning.category || "other"
+    }
+  }));
+
+  return {
+    wizardType: "HOMOGRAPH_SPLIT",
+    targetTerm: cleanTerm,
+    promptMessage: `The term "${cleanTerm}" appears ambiguous. Which context matches your intended entry?`,
+    options: [
+      ...resolutionOptions,
+      {
+        optionId: "split_opt_custom_new",
+        meaningDefinition: "None of these. Create a brand new distinct meaning mapping.",
+        contextCategory: "custom",
+        actionPayload: {
+          splitRequired: true,
+          refinedTitle: `${cleanTerm} (custom)`,
+          suggestedCategory: "other"
+        }
+      }
+    ]
+  };
+}
+
 export function applyProgressiveDisclosureSchema(entry) {
   if (!entry || !entry.category) {
     throw new Error("Invalid entry provided for schema mapping");
@@ -383,3 +423,4 @@ export function applyProgressiveDisclosureSchema(entry) {
     }
   };
 }
+
