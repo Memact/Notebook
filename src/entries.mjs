@@ -330,3 +330,124 @@ function id(prefix) {
 function now(customNow) {
   return customNow ? new Date(customNow).toISOString() : new Date().toISOString()
 }
+export function exportEvidenceChainGraph(entry) {
+  if (!entry || !entry.entry_id) {
+    throw new Error("A valid entry is required to export an evidence graph");
+  }
+
+  const nodes = [];
+  const edges = [];
+
+  // 1. Core Entry Node
+  nodes.push({
+    id: entry.entry_id,
+    label: entry.title,
+    type: "entry",
+    data: {
+      status: entry.status,
+      confidence: entry.confidence,
+      category: entry.category,
+      updated_at: entry.updated_at
+    }
+  });
+
+  // 2. Source & Evidence Nodes
+  if (Array.isArray(entry.sources)) {
+    entry.sources.forEach((source, sIdx) => {
+      const sourceId = `${entry.entry_id}_source_${sIdx}`;
+      
+      nodes.push({
+        id: sourceId,
+        label: source.name || "Source",
+        type: "source",
+        data: {
+          source_type: source.type,
+          confidence: source.confidence
+        }
+  });
+
+      edges.push({
+        id: `edge_${sourceId}_to_${entry.entry_id}`,
+        source: sourceId,
+        target: entry.entry_id,
+        relationType: "PROPOSED_BY"
+      });
+
+      // Evidence strings tied to this source
+      if (Array.isArray(source.evidence)) {
+        source.evidence.forEach((evText, eIdx) => {
+          const evidenceId = `${sourceId}_ev_${eIdx}`;
+          nodes.push({
+            id: evidenceId,
+            label: evText,
+            type: "evidence",
+            data: {}
+          });
+
+          edges.push({
+            id: `edge_${evidenceId}_to_${sourceId}`,
+            source: evidenceId,
+            target: sourceId,
+            relationType: "SUBSTANTIATES"
+          });
+        });
+      }
+    });
+  }
+
+  // 3. Contradiction Nodes
+  if (Array.isArray(entry.contradictions)) {
+    entry.contradictions.forEach((contra, cIdx) => {
+      const contraId = `${entry.entry_id}_contra_${cIdx}`;
+      
+      nodes.push({
+        id: contraId,
+        label: contra.title,
+        type: "contradiction",
+        data: {
+          source: contra.source,
+          reason: contra.reason,
+          confidence: contra.confidence,
+          resolved: contra.resolved
+        }
+      });
+
+      edges.push({
+        id: `edge_${contraId}_to_${entry.entry_id}`,
+        source: contraId,
+        target: entry.entry_id,
+        relationType: contra.resolved ? "RESOLVED_CONTRADICTION" : "CONTRADICTS"
+      });
+    });
+  }
+
+  // 4. Competing Interpretation Nodes
+  if (Array.isArray(entry.competing_interpretations)) {
+    entry.competing_interpretations.forEach((interp, iIdx) => {
+      const interpId = `${entry.entry_id}_interp_${iIdx}`;
+      
+      nodes.push({
+        id: interpId,
+        label: interp.title,
+        type: "interpretation",
+        data: {
+          reason: interp.reason,
+          confidence: interp.confidence
+        }
+      });
+
+      edges.push({
+        id: `edge_${interpId}_to_${entry.entry_id}`,
+        source: interpId,
+        target: entry.entry_id,
+        relationType: "COMPETING_INTERPRETATION"
+      });
+    });
+  }
+
+  return {
+    version: "1.0.0",
+    entry_id: entry.entry_id,
+    graph: { nodes, edges }
+  };
+}

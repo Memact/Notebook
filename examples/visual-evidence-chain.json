@@ -1,0 +1,40 @@
+{
+  "version": "1.0.0",
+  "entry_id": "notebook_entry_demo123",
+  "graph": {
+    "nodes": [
+      {
+        "id": "notebook_entry_demo123",
+        "label": "Project SSoC26 Guidelines Update",
+        "type": "entry",
+        "data": { "status": "contradicted", "confidence": 0.85 }
+      },
+      {
+        "id": "notebook_entry_demo123_source_0",
+        "label": "Memact feature",
+        "type": "source",
+        "data": { "source_type": "memact_feature", "confidence": 0.9 }
+      },
+      {
+        "id": "notebook_entry_demo123_source_0_ev_0",
+        "label": "Document scanned on repository roadmap markdown",
+        "type": "evidence",
+        "data": {}
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge_notebook_entry_demo123_source_0_to_notebook_entry_demo123",
+        "source": "notebook_entry_demo123_source_0",
+        "target": "notebook_entry_demo123",
+        "relationType": "PROPOSED_BY"
+      },
+      {
+        "id": "edge_notebook_entry_demo123_source_0_ev_0_to_notebook_entry_demo123_source_0",
+        "source": "notebook_entry_demo123_source_0_ev_0",
+        "target": "notebook_entry_demo123_source_0",
+        "relationType": "SUBSTANTIATES"
+      }
+    ]
+  }
+}

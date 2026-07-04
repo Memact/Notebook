@@ -7,6 +7,7 @@ export {
   deleteEntry,
   editEntry,
   explainWhyEntryExists,
+  exportEvidenceChainGraph, 
   filterPublicEntries,
   getInboxStats,
   markExpired,
