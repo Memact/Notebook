@@ -2,6 +2,7 @@ export {
   acceptEntry,
   addCompetingInterpretation,
   addContradiction,
+  applyProgressiveDisclosureSchema,
   blockAppMemory,
   calculateSourceAuthorityStats,
   createUserEntry,
