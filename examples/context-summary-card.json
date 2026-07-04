@@ -1,0 +1,10 @@
+{
+  "cardId": "card_notebook_entry_demo789_ex",
+  "layoutType": "SUMMARY_CARD",
+  "displaySchema": {
+    "title": "Update in [PROFILE] via Saarthi Healthcare AI",
+    "body": "Entry ID: notebook_entry_demo789 updated key variables: [name, bio, api_keys].",
+    "footer": "Refreshed on: 7/4/2026, 10:36 AM",
+    "badgeStyle": "info"
+  }
+}

@@ -8,6 +8,7 @@ export {
   editEntry,
   explainWhyEntryExists,
   filterPublicEntries,
+  generateContextSummaryCard,
   getInboxStats,
   markExpired,
   proposeAppEntry,

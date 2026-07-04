@@ -330,3 +330,36 @@ function id(prefix) {
 function now(customNow) {
   return customNow ? new Date(customNow).toISOString() : new Date().toISOString()
 }
+/**
+ * Issue #28: Dynamic Context Summary Cards for Quick Review
+ * Formats context updates into structured human-readable text cards.
+ */
+export function generateContextSummaryCard(entry) {
+  if (!entry || !entry.entry_id) {
+    throw new Error("Invalid entry provided for generating summary cards");
+  }
+
+  const category = entry.category || "unknown";
+  const sourceName = entry.sources?.[0]?.name || "System Core";
+  const timestamp = entry.updated_at || entry.created_at || new Date().toISOString();
+  
+  // Condense the value keys into a human-readable list string
+  const modifiedFields = entry.value && typeof entry.value === "object" 
+    ? Object.keys(entry.value).join(", ") 
+    : "no payload fields";
+
+  const cardTitle = `Update in [${category.toUpperCase()}] via ${sourceName}`;
+  const cardBody = `Entry ID: ${entry.entry_id} updated key variables: [${modifiedFields}].`;
+  const footerTimestamp = new Date(timestamp).toLocaleString();
+
+  return {
+    cardId: `card_${entry.entry_id}_${Math.random().toString(36).slice(2, 6)}`,
+    layoutType: "SUMMARY_CARD",
+    displaySchema: {
+      title: cardTitle,
+      body: cardBody,
+      footer: `Refreshed on: ${footerTimestamp}`,
+      badgeStyle: entry.status === "critical" ? "danger" : "info"
+    }
+  };
+}
