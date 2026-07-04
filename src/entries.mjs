@@ -330,3 +330,51 @@ function id(prefix) {
 function now(customNow) {
   return customNow ? new Date(customNow).toISOString() : new Date().toISOString()
 }
+/**
+ * Issue #30: Interactive Onboarding Flow for Context Settings
+ * Generates configuration steps and default preference presets for onboarding flows.
+ */
+export function generateOnboardingFlowConfig() {
+  return {
+    flowId: "onboarding_context_v1",
+    totalSteps: 3,
+    defaultPresets: {
+      defaultVisibility: "private",
+      globalMemoryDecay: "stable",
+      autoSyncApps: true,
+      allowProgressiveDisclosure: true
+    },
+    steps: [
+      {
+        stepNumber: 1,
+        stepKey: "PRIVACY_CONFIG",
+        title: "Configure Context Privacy",
+        description: "Choose how your application memory is stored. By default, entries remain strictly private.",
+        options: [
+          { value: "private", label: "Strictly Private (Local-First)", selected: true },
+          { value: "public", label: "Shared/Public Context Block", selected: false }
+        ]
+      },
+      {
+        stepNumber: 2,
+        stepKey: "DECAY_PREFERENCE",
+        title: "Memory Persistence Levels",
+        description: "Define how long peripheral context claims persist before experiencing memory decay.",
+        options: [
+          { value: "stable", label: "Persistent (No Expiration)", selected: true },
+          { value: "ephemeral", label: "Fading Context (30-day decay window)", selected: false }
+        ]
+      },
+      {
+        stepNumber: 3,
+        stepKey: "APP_INTEGRATIONS",
+        title: "Authorized Source Connections",
+        description: "Enable automatic protocol contribution updates from authorized internal applications.",
+        options: [
+          { value: "auto_approve", label: "Auto-Accept Claims", selected: false },
+          { value: "manual_review", label: "Review via Inbox Wizard", selected: true }
+        ]
+      }
+    ]
+  };
+}

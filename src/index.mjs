@@ -8,6 +8,7 @@ export {
   editEntry,
   explainWhyEntryExists,
   filterPublicEntries,
+  generateOnboardingFlowConfig,
   getInboxStats,
   markExpired,
   proposeAppEntry,

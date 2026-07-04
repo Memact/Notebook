@@ -1,0 +1,10 @@
+{
+  "flowId": "onboarding_context_v1",
+  "totalSteps": 3,
+  "defaultPresets": {
+    "defaultVisibility": "private",
+    "globalMemoryDecay": "stable",
+    "autoSyncApps": true,
+    "allowProgressiveDisclosure": true
+  }
+}
