@@ -330,3 +330,57 @@ function id(prefix) {
 function now(customNow) {
   return customNow ? new Date(customNow).toISOString() : new Date().toISOString()
 }
+/**
+ * Issue #22: Context Search and Filtering Interface Data Models
+ * Filters a collection of entries based on query parameters
+ */
+export function filterNotebookEntries(entries = [], filters = {}) {
+  const { category, appId, searchValue } = filters;
+
+  return entries.filter((entry) => {
+    if (!entry) return false;
+
+    // 1. Filter by category if specified
+    if (category && entry.category?.toLowerCase() !== category.toLowerCase()) {
+      return false;
+    }
+
+    // 2. Filter by specific app source identifier
+    if (appId) {
+      const hasMatchingSource = entry.sources?.some(s => s.app_id === appId);
+      if (!hasMatchingSource) return false;
+    }
+
+    // 3. Search deeply inside value fields
+    if (searchValue) {
+      const query = searchValue.toLowerCase();
+      const matchString = JSON.stringify(entry.value || {}).toLowerCase();
+      const matchId = (entry.entry_id || "").toLowerCase();
+      
+      if (!matchString.includes(query) && !matchId.includes(query)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+}
+
+/**
+ * Issue #21: Multi-Profile Identity Switcher Data Formats
+ * Validates switching target namespaces for active user profiles
+ */
+export function switchProfileNamespace(currentProfiles = [], targetProfileId) {
+  const profileExists = currentProfiles.find(p => p.profileId === targetProfileId);
+  
+  if (!profileExists) {
+    throw new Error(`Target profile identity namespace '${targetProfileId}' not found.`);
+  }
+
+  return {
+    activeProfileId: profileExists.profileId,
+    namespace: profileExists.namespace || "global",
+    scopeRules: profileExists.scopeRules || { isolationLevel: "strict" },
+    switchedAt: new Date().toISOString()
+  };
+}

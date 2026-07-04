@@ -7,6 +7,7 @@ export {
   deleteEntry,
   editEntry,
   explainWhyEntryExists,
+  filterNotebookEntries,
   filterPublicEntries,
   getInboxStats,
   markExpired,
