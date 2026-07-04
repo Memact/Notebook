@@ -1,0 +1,27 @@
+{
+  "wizardType": "HOMOGRAPH_SPLIT",
+  "targetTerm": "Apple",
+  "promptMessage": "The term \"Apple\" appears ambiguous. Which context matches your intended entry?",
+  "options": [
+    {
+      "optionId": "split_opt_0_demo",
+      "meaningDefinition": "The consumer electronics and tech company",
+      "contextCategory": "tech",
+      "actionPayload": {
+        "splitRequired": true,
+        "refinedTitle": "Apple (tech)",
+        "suggestedCategory": "tech"
+      }
+    },
+    {
+      "optionId": "split_opt_1_demo",
+      "meaningDefinition": "The round fruit with red or green skin",
+      "contextCategory": "food",
+      "actionPayload": {
+        "splitRequired": true,
+        "refinedTitle": "Apple (food)",
+        "suggestedCategory": "food"
+      }
+    }
+  ]
+}

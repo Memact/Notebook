@@ -2,6 +2,24 @@ const SOURCE_TYPES = new Set(["user", "app", "memact", "memact_feature"])
 const STATUSES = new Set(["draft", "pending", "accepted", "edited", "rejected", "expired", "deleted", "contradicted", "resolved"])
 const VISIBILITIES = new Set(["private", "shareable", "public"])
 const IMPORTANCE = new Set(["low", "normal", "important"])
+// Define UI progressive disclosure layout visibility categories rules
+const CATEGORY_LAYOUT_SCHEMAS = {
+  profile: {
+    essential: ["name", "email", "bio"],
+    advanced: ["api_keys", "session_tokens", "metadata"],
+    defaultVisibility: "collapsed"
+  },
+  preferences: {
+    essential: ["theme", "language", "notifications"],
+    advanced: ["webhook_urls", "custom_css"],
+    defaultVisibility: "visible"
+  },
+  other: {
+    essential: ["note"],
+    advanced: [],
+    defaultVisibility: "visible"
+  }
+};
 
 export function createUserEntry(input = {}) {
   return createEntry({
@@ -330,6 +348,7 @@ function id(prefix) {
 function now(customNow) {
   return customNow ? new Date(customNow).toISOString() : new Date().toISOString()
 }
+
 export function exportEvidenceChainGraph(entry) {
   if (!entry || !entry.entry_id) {
     throw new Error("A valid entry is required to export an evidence graph");
@@ -449,5 +468,81 @@ export function exportEvidenceChainGraph(entry) {
     version: "1.0.0",
     entry_id: entry.entry_id,
     graph: { nodes, edges }
+  };
+}
+
+
+export function generateAmbiguityResolutionPrompt(ambiguousTerm, suggestedMeanings = []) {
+  if (!ambiguousTerm || typeof ambiguousTerm !== "string" || !ambiguousTerm.trim()) {
+    throw new Error("An ambiguous term is required to generate a resolution wizard path");
+  }
+
+  const cleanTerm = ambiguousTerm.trim();
+  
+  // Format options for user clarity in the interface selection wizard
+  const resolutionOptions = suggestedMeanings.map((meaning, index) => ({
+    optionId: `split_opt_${index}_${Math.random().toString(36).slice(2, 6)}`,
+    meaningDefinition: meaning.definition || "No definition provided",
+    contextCategory: meaning.category || "other",
+    actionPayload: {
+      splitRequired: true,
+      refinedTitle: `${cleanTerm} (${meaning.category || "refined"})`,
+      suggestedCategory: meaning.category || "other"
+    }
+  }));
+
+  return {
+    wizardType: "HOMOGRAPH_SPLIT",
+    targetTerm: cleanTerm,
+    promptMessage: `The term "${cleanTerm}" appears ambiguous. Which context matches your intended entry?`,
+    options: [
+      ...resolutionOptions,
+      {
+        optionId: "split_opt_custom_new",
+        meaningDefinition: "None of these. Create a brand new distinct meaning mapping.",
+        contextCategory: "custom",
+        actionPayload: {
+          splitRequired: true,
+          refinedTitle: `${cleanTerm} (custom)`,
+          suggestedCategory: "other"
+        }
+      }
+    ]
+  };
+}
+
+export function applyProgressiveDisclosureSchema(entry) {
+  if (!entry || !entry.category) {
+    throw new Error("Invalid entry provided for schema mapping");
+  }
+
+  const category = entry.category.toLowerCase();
+  const schema = CATEGORY_LAYOUT_SCHEMAS[category] || CATEGORY_LAYOUT_SCHEMAS["other"];
+  
+  const valueFields = entry.value && typeof entry.value === "object" ? Object.keys(entry.value) : [];
+  const fieldsMetadata = {};
+
+  valueFields.forEach((field) => {
+    let preference = "advanced"; // Default fallback if unspecified
+    
+    if (schema.essential.includes(field)) {
+      preference = "essential";
+    } else if (schema.advanced.includes(field)) {
+      preference = "advanced";
+    }
+
+    fieldsMetadata[field] = {
+      visibilityPreference: preference,
+      initialDisplay: preference === "essential" ? "visible" : schema.defaultVisibility
+    };
+  });
+
+  return {
+    entry_id: entry.entry_id,
+    category: category,
+    uiSchema: {
+      defaultLayout: schema.defaultVisibility,
+      fields: fieldsMetadata
+    }
   };
 }
