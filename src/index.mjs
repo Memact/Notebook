@@ -8,6 +8,7 @@ export {
   editEntry,
   explainWhyEntryExists,
   filterPublicEntries,
+  generateAmbiguityResolutionPrompt,
   getInboxStats,
   markExpired,
   proposeAppEntry,
