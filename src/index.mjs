@@ -3,6 +3,7 @@ export {
   addCompetingInterpretation,
   addContradiction,
   blockAppMemory,
+  calculateContextFreshness,
   createUserEntry,
   deleteEntry,
   editEntry,
