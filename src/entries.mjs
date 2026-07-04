@@ -330,3 +330,26 @@ function id(prefix) {
 function now(customNow) {
   return customNow ? new Date(customNow).toISOString() : new Date().toISOString()
 }
+/**
+ * Issue #31: UI Specifications for Context Modification History Logs
+ * Transforms raw modification timelines into structured row data for UI tables.
+ */
+export function formatModificationHistoryLogs(entry) {
+  if (!entry || !Array.isArray(entry.history)) {
+    return [];
+  }
+
+  return entry.history.map((log, index) => {
+    return {
+      rowId: `log_${entry.entry_id || "entry"}_${index}`,
+      timestamp: log.timestamp || new Date().toISOString(),
+      appName: log.app_id || log.source_name || "System Core",
+      modifiedField: log.field || "all_fields",
+      changes: {
+        previousValue: log.old_value !== undefined ? log.old_value : null,
+        newValue: log.new_value !== undefined ? log.new_value : null,
+        actionType: log.action || "UPDATE"
+      }
+    };
+  });
+}
