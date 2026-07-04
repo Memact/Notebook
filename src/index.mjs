@@ -3,6 +3,7 @@ export {
   addCompetingInterpretation,
   addContradiction,
   blockAppMemory,
+  calculateSourceAuthorityStats,
   createUserEntry,
   deleteEntry,
   editEntry,

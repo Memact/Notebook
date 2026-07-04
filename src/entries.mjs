@@ -330,3 +330,58 @@ function id(prefix) {
 function now(customNow) {
   return customNow ? new Date(customNow).toISOString() : new Date().toISOString()
 }
+export function calculateSourceAuthorityStats(entries = []) {
+  const sourceStats = {};
+
+  entries.forEach((entry) => {
+    if (!entry || !Array.isArray(entry.sources)) return;
+
+    entry.sources.forEach((source) => {
+      const sourceKey = source.app_id || source.name || "Unknown Source";
+      
+      if (!sourceStats[sourceKey]) {
+        sourceStats[sourceKey] = {
+          sourceId: sourceKey,
+          sourceName: source.name || "Unnamed Source",
+          sourceType: source.type || entry.source_type,
+          totalContributions: 0,
+          acceptedCount: 0,
+          rejectedCount: 0,
+          confidenceScores: []
+        };
+      }
+
+      const stats = sourceStats[sourceKey];
+      stats.totalContributions += 1;
+      stats.confidenceScores.push(source.confidence ?? 0.5);
+
+      if (["accepted", "edited", "resolved"].includes(entry.status)) {
+        stats.acceptedCount += 1;
+      } else if (entry.status === "rejected") {
+        stats.rejectedCount += 1;
+      }
+    });
+  });
+
+  // Format and calculate averages for visualization chart layouts
+  const chartLayoutData = Object.values(sourceStats).map((stats) => {
+    const totalScores = stats.confidenceScores.reduce((sum, score) => sum + score, 0);
+    const averageConfidence = stats.confidenceScores.length > 0 ? totalScores / stats.confidenceScores.length : 0.5;
+    const reliabilityRate = stats.totalContributions > 0 ? stats.acceptedCount / stats.totalContributions : 0;
+
+    return {
+      sourceId: stats.sourceId,
+      sourceName: stats.sourceName,
+      sourceType: stats.sourceType,
+      contributionCount: stats.totalContributions,
+      authorityMetrics: {
+        averageConfidence: parseFloat(averageConfidence.toFixed(4)),
+        reliabilityRate: parseFloat(reliabilityRate.toFixed(4)),
+        trustScore: parseFloat(((averageConfidence * 0.4) + (reliabilityRate * 0.6)).toFixed(4))
+      }
+    };
+  });
+
+  // Sort by contribution volume primarily to assist chart placement
+  return chartLayoutData.sort((a, b) => b.contributionCount - a.contributionCount);
+}

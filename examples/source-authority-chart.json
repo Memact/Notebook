@@ -1,0 +1,24 @@
+[
+  {
+    "sourceId": "saarthi_healthcare_ai",
+    "sourceName": "Saarthi Healthcare AI",
+    "sourceType": "app",
+    "contributionCount": 42,
+    "authorityMetrics": {
+      "averageConfidence": 0.92,
+      "reliabilityRate: ": 0.95,
+      "trustScore": 0.938
+    }
+  },
+  {
+    "sourceId": "user",
+    "sourceName": "You",
+    "sourceType": "user",
+    "contributionCount": 28,
+    "authorityMetrics": {
+      "averageConfidence": 1.0,
+      "reliabilityRate": 1.0,
+      "trustScore": 1.0
+    }
+  }
+]
