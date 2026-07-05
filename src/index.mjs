@@ -5,13 +5,18 @@ export {
   applyProgressiveDisclosureSchema,
   blockAppMemory,
   calculateContextFreshness,
+  calculateSourceAuthorityStats,
   createUserEntry,
   deleteEntry,
   editEntry,
   explainWhyEntryExists,
-  exportEvidenceChainGraph, 
+  exportEvidenceChainGraph,
+  filterNotebookEntries,
   filterPublicEntries,
+  formatModificationHistoryLogs,
   generateAmbiguityResolutionPrompt,
+  generateContextSummaryCard,
+  generateOnboardingFlowConfig,
   getInboxStats,
   markExpired,
   proposeAppEntry,
@@ -20,5 +25,6 @@ export {
   proposePlaygroundEntry,
   rejectEntry,
   resolveContradiction,
-  setVisibility
+  setVisibility,
+  switchProfileNamespace
 } from "./entries.mjs"
