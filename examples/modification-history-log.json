@@ -1,0 +1,13 @@
+[
+  {
+    "rowId": "log_profile_entry_0",
+    "timestamp": "2026-07-04T10:30:00.000Z",
+    "appName": "saarthi_healthcare_ai",
+    "modifiedField": "language_bridge",
+    "changes": {
+      "previousValue": "en",
+      "newValue": "hi",
+      "actionType": "LOCALE_PATCH"
+    }
+  }
+]
