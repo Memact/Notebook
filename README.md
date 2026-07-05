@@ -12,7 +12,7 @@ Notebook gives you direct control over your data:
 ## Development
 
 To install and run tests:
-```powershell
+```sh
 npm install
 npm test
 ```
