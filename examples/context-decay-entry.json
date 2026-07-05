@@ -1,0 +1,9 @@
+{
+  "entry_id": "notebook_entry_decay_999",
+  "freshness_metrics": {
+    "entry_id": "notebook_entry_decay_999",
+    "freshness": 0.75,
+    "decayLevel": 0.25,
+    "status": "fresh"
+  }
+}

@@ -349,6 +349,65 @@ function now(customNow) {
   return customNow ? new Date(customNow).toISOString() : new Date().toISOString()
 }
 
+export function calculateContextFreshness(entry, options = {}) {
+  if (!entry || !entry.entry_id) {
+    throw new Error("Valid entry required for decay calculations");
+  }
+
+  const currentTime = new Date(options.now || new Date()).getTime();
+  const startTime = new Date(entry.created_at).getTime();
+  
+  // If no expiration is set, memory does not decay by default (stable context)
+  if (!entry.expires_at) {
+    return {
+      entry_id: entry.entry_id,
+      freshness: 1.0,
+      decayLevel: 0.0,
+      status: "stable"
+    };
+  }
+
+  const endTime = new Date(entry.expires_at).getTime();
+  const totalDuration = endTime - startTime;
+
+  if (totalDuration <= 0) {
+    return {
+      entry_id: entry.entry_id,
+      freshness: 0.0,
+      decayLevel: 1.0,
+      status: "expired"
+    };
+  }
+
+  // Calculate elapsed progress
+  const elapsed = currentTime - startTime;
+  const progress = Math.max(0, Math.min(1, elapsed / totalDuration));
+  
+  const freshness = 1.0 - progress;
+  const decayLevel = progress;
+
+  let status = "fresh";
+  if (freshness < 0.25) status = "critical";
+  else if (freshness < 0.6) status = "fading";
+
+  if (currentTime >= endTime || entry.status === "expired") {
+    return {
+      entry_id: entry.entry_id,
+      freshness: 0.0,
+      decayLevel: 1.0,
+      status: "expired"
+    };
+  }
+
+  return {
+    entry_id: entry.entry_id,
+    freshness: parseFloat(freshness.toFixed(4)),
+    decayLevel: parseFloat(decayLevel.toFixed(4)),
+    status: status
+  };
+}
+
+
 export function exportEvidenceChainGraph(entry) {
   if (!entry || !entry.entry_id) {
     throw new Error("A valid entry is required to export an evidence graph");
@@ -546,3 +605,4 @@ export function applyProgressiveDisclosureSchema(entry) {
     }
   };
 }
+

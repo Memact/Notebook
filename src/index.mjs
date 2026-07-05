@@ -4,6 +4,7 @@ export {
   addContradiction,
   applyProgressiveDisclosureSchema,
   blockAppMemory,
+  calculateContextFreshness,
   createUserEntry,
   deleteEntry,
   editEntry,
