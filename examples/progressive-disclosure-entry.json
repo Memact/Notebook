@@ -1,0 +1,21 @@
+{
+  "entry_id": "notebook_entry_demo789",
+  "category": "profile",
+  "uiSchema": {
+    "defaultLayout": "collapsed",
+    "fields": {
+      "name": {
+        "visibilityPreference": "essential",
+        "initialDisplay": "visible"
+      },
+      "bio": {
+        "visibilityPreference": "essential",
+        "initialDisplay": "visible"
+      },
+      "api_keys": {
+        "visibilityPreference": "advanced",
+        "initialDisplay": "collapsed"
+      }
+    }
+  }
+}

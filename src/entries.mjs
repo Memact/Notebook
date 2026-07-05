@@ -2,6 +2,24 @@ const SOURCE_TYPES = new Set(["user", "app", "memact", "memact_feature"])
 const STATUSES = new Set(["draft", "pending", "accepted", "edited", "rejected", "expired", "deleted", "contradicted", "resolved"])
 const VISIBILITIES = new Set(["private", "shareable", "public"])
 const IMPORTANCE = new Set(["low", "normal", "important"])
+// Define UI progressive disclosure layout visibility categories rules
+const CATEGORY_LAYOUT_SCHEMAS = {
+  profile: {
+    essential: ["name", "email", "bio"],
+    advanced: ["api_keys", "session_tokens", "metadata"],
+    defaultVisibility: "collapsed"
+  },
+  preferences: {
+    essential: ["theme", "language", "notifications"],
+    advanced: ["webhook_urls", "custom_css"],
+    defaultVisibility: "visible"
+  },
+  other: {
+    essential: ["note"],
+    advanced: [],
+    defaultVisibility: "visible"
+  }
+};
 
 export function createUserEntry(input = {}) {
   return createEntry({
@@ -330,6 +348,7 @@ function id(prefix) {
 function now(customNow) {
   return customNow ? new Date(customNow).toISOString() : new Date().toISOString()
 }
+
 export function calculateContextFreshness(entry, options = {}) {
   if (!entry || !entry.entry_id) {
     throw new Error("Valid entry required for decay calculations");
@@ -387,3 +406,203 @@ export function calculateContextFreshness(entry, options = {}) {
     status: status
   };
 }
+
+
+export function exportEvidenceChainGraph(entry) {
+  if (!entry || !entry.entry_id) {
+    throw new Error("A valid entry is required to export an evidence graph");
+  }
+
+  const nodes = [];
+  const edges = [];
+
+  // 1. Core Entry Node
+  nodes.push({
+    id: entry.entry_id,
+    label: entry.title,
+    type: "entry",
+    data: {
+      status: entry.status,
+      confidence: entry.confidence,
+      category: entry.category,
+      updated_at: entry.updated_at
+    }
+  });
+
+  // 2. Source & Evidence Nodes
+  if (Array.isArray(entry.sources)) {
+    entry.sources.forEach((source, sIdx) => {
+      const sourceId = `${entry.entry_id}_source_${sIdx}`;
+      
+      nodes.push({
+        id: sourceId,
+        label: source.name || "Source",
+        type: "source",
+        data: {
+          source_type: source.type,
+          confidence: source.confidence
+        }
+  });
+
+      edges.push({
+        id: `edge_${sourceId}_to_${entry.entry_id}`,
+        source: sourceId,
+        target: entry.entry_id,
+        relationType: "PROPOSED_BY"
+      });
+
+      // Evidence strings tied to this source
+      if (Array.isArray(source.evidence)) {
+        source.evidence.forEach((evText, eIdx) => {
+          const evidenceId = `${sourceId}_ev_${eIdx}`;
+          nodes.push({
+            id: evidenceId,
+            label: evText,
+            type: "evidence",
+            data: {}
+          });
+
+          edges.push({
+            id: `edge_${evidenceId}_to_${sourceId}`,
+            source: evidenceId,
+            target: sourceId,
+            relationType: "SUBSTANTIATES"
+          });
+        });
+      }
+    });
+  }
+
+  // 3. Contradiction Nodes
+  if (Array.isArray(entry.contradictions)) {
+    entry.contradictions.forEach((contra, cIdx) => {
+      const contraId = `${entry.entry_id}_contra_${cIdx}`;
+      
+      nodes.push({
+        id: contraId,
+        label: contra.title,
+        type: "contradiction",
+        data: {
+          source: contra.source,
+          reason: contra.reason,
+          confidence: contra.confidence,
+          resolved: contra.resolved
+        }
+      });
+
+      edges.push({
+        id: `edge_${contraId}_to_${entry.entry_id}`,
+        source: contraId,
+        target: entry.entry_id,
+        relationType: contra.resolved ? "RESOLVED_CONTRADICTION" : "CONTRADICTS"
+      });
+    });
+  }
+
+  // 4. Competing Interpretation Nodes
+  if (Array.isArray(entry.competing_interpretations)) {
+    entry.competing_interpretations.forEach((interp, iIdx) => {
+      const interpId = `${entry.entry_id}_interp_${iIdx}`;
+      
+      nodes.push({
+        id: interpId,
+        label: interp.title,
+        type: "interpretation",
+        data: {
+          reason: interp.reason,
+          confidence: interp.confidence
+        }
+      });
+
+      edges.push({
+        id: `edge_${interpId}_to_${entry.entry_id}`,
+        source: interpId,
+        target: entry.entry_id,
+        relationType: "COMPETING_INTERPRETATION"
+      });
+    });
+  }
+
+  return {
+    version: "1.0.0",
+    entry_id: entry.entry_id,
+    graph: { nodes, edges }
+  };
+}
+
+
+export function generateAmbiguityResolutionPrompt(ambiguousTerm, suggestedMeanings = []) {
+  if (!ambiguousTerm || typeof ambiguousTerm !== "string" || !ambiguousTerm.trim()) {
+    throw new Error("An ambiguous term is required to generate a resolution wizard path");
+  }
+
+  const cleanTerm = ambiguousTerm.trim();
+  
+  // Format options for user clarity in the interface selection wizard
+  const resolutionOptions = suggestedMeanings.map((meaning, index) => ({
+    optionId: `split_opt_${index}_${Math.random().toString(36).slice(2, 6)}`,
+    meaningDefinition: meaning.definition || "No definition provided",
+    contextCategory: meaning.category || "other",
+    actionPayload: {
+      splitRequired: true,
+      refinedTitle: `${cleanTerm} (${meaning.category || "refined"})`,
+      suggestedCategory: meaning.category || "other"
+    }
+  }));
+
+  return {
+    wizardType: "HOMOGRAPH_SPLIT",
+    targetTerm: cleanTerm,
+    promptMessage: `The term "${cleanTerm}" appears ambiguous. Which context matches your intended entry?`,
+    options: [
+      ...resolutionOptions,
+      {
+        optionId: "split_opt_custom_new",
+        meaningDefinition: "None of these. Create a brand new distinct meaning mapping.",
+        contextCategory: "custom",
+        actionPayload: {
+          splitRequired: true,
+          refinedTitle: `${cleanTerm} (custom)`,
+          suggestedCategory: "other"
+        }
+      }
+    ]
+  };
+}
+
+export function applyProgressiveDisclosureSchema(entry) {
+  if (!entry || !entry.category) {
+    throw new Error("Invalid entry provided for schema mapping");
+  }
+
+  const category = entry.category.toLowerCase();
+  const schema = CATEGORY_LAYOUT_SCHEMAS[category] || CATEGORY_LAYOUT_SCHEMAS["other"];
+  
+  const valueFields = entry.value && typeof entry.value === "object" ? Object.keys(entry.value) : [];
+  const fieldsMetadata = {};
+
+  valueFields.forEach((field) => {
+    let preference = "advanced"; // Default fallback if unspecified
+    
+    if (schema.essential.includes(field)) {
+      preference = "essential";
+    } else if (schema.advanced.includes(field)) {
+      preference = "advanced";
+    }
+
+    fieldsMetadata[field] = {
+      visibilityPreference: preference,
+      initialDisplay: preference === "essential" ? "visible" : schema.defaultVisibility
+    };
+  });
+
+  return {
+    entry_id: entry.entry_id,
+    category: category,
+    uiSchema: {
+      defaultLayout: schema.defaultVisibility,
+      fields: fieldsMetadata
+    }
+  };
+}
+
