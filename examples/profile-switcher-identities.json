@@ -1,0 +1,17 @@
+{
+  "availableProfiles": [
+    {
+      "profileId": "prof_personal_789",
+      "profileName": "Personal Account",
+      "namespace": "usr_personal_space",
+      "scopeRules": { "isolationLevel": "flexible" }
+    },
+    {
+      "profileId": "prof_work_123",
+      "profileName": "Work Workspace",
+      "namespace": "org_enterprise_space",
+      "scopeRules": { "isolationLevel": "strict" }
+    }
+  ],
+  "targetProfileId": "prof_work_123"
+}
