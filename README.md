@@ -1,7 +1,22 @@
-# Memact Notebook (Wiki)
+# Memact Notebook
 
-The governance layer of Memact. It defines the visibility rules and access permissions for statements saved under a user's address.
+Notebook is the user interface that lets you view, approve, edit, and control your context and app permissions.
 
-## Core Responsibilities
-- **Visibility Preferences**: Enforces who can see each approved statement: *Public*, *Friends*, or *Only Me*.
-- **Governance Rules**: Ensures connected apps cannot read private statements and can only query approved things within their allowed scopes.
+## What Notebook Does
+
+Notebook gives you direct control over your data:
+- **Pending Suggestions**: Review suggestions made by apps, then approve, reject, or edit them.
+- **Context Viewer**: See all your approved context, showing how fresh it is and which apps suggested it.
+- **App Permissions**: Control which apps can request your context, and revoke access at any time.
+
+## Development
+
+To install and run tests:
+```powershell
+npm install
+npm test
+```
+
+## License
+
+Notebook is open source under the Apache 2.0 license.
