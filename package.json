@@ -4,7 +4,7 @@
   "private": false,
   "license": "BUSL-1.1",
   "type": "module",
-  "description": "User-controlled memory surface for Memact Notebook entries, suggestions, visibility, and governance.",
+  "description": "User dashboard to view, approve, and control identity context.",
   "scripts": {
     "check": "npm test",
     "test": "node --test"
