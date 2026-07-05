@@ -570,6 +570,60 @@ export function generateAmbiguityResolutionPrompt(ambiguousTerm, suggestedMeanin
   };
 }
 
+export function calculateSourceAuthorityStats(entries = []) {
+  const sourceStats = {};
+
+  entries.forEach((entry) => {
+    if (!entry || !Array.isArray(entry.sources)) return;
+
+    entry.sources.forEach((source) => {
+      const sourceKey = source.app_id || source.name || "Unknown Source";
+      
+      if (!sourceStats[sourceKey]) {
+        sourceStats[sourceKey] = {
+          sourceId: sourceKey,
+          sourceName: source.name || "Unnamed Source",
+          sourceType: source.type || entry.source_type,
+          totalContributions: 0,
+          acceptedCount: 0,
+          rejectedCount: 0,
+          confidenceScores: []
+        };
+      }
+
+      const stats = sourceStats[sourceKey];
+      stats.totalContributions += 1;
+      stats.confidenceScores.push(source.confidence ?? 0.5);
+
+      if (["accepted", "edited", "resolved"].includes(entry.status)) {
+        stats.acceptedCount += 1;
+      } else if (entry.status === "rejected") {
+        stats.rejectedCount += 1;
+      }
+    });
+  });
+
+  // Format and calculate averages for visualization chart layouts
+  const chartLayoutData = Object.values(sourceStats).map((stats) => {
+    const totalScores = stats.confidenceScores.reduce((sum, score) => sum + score, 0);
+    const averageConfidence = stats.confidenceScores.length > 0 ? totalScores / stats.confidenceScores.length : 0.5;
+    const reliabilityRate = stats.totalContributions > 0 ? stats.acceptedCount / stats.totalContributions : 0;
+
+    return {
+      sourceId: stats.sourceId,
+      sourceName: stats.sourceName,
+      sourceType: stats.sourceType,
+      contributionCount: stats.totalContributions,
+      authorityMetrics: {
+        averageConfidence: parseFloat(averageConfidence.toFixed(4)),
+        reliabilityRate: parseFloat(reliabilityRate.toFixed(4)),
+        trustScore: parseFloat(((averageConfidence * 0.4) + (reliabilityRate * 0.6)).toFixed(4))
+      }
+    };
+  });
+
+  // Sort by contribution volume primarily to assist chart placement
+  return chartLayoutData.sort((a, b) => b.contributionCount - a.contributionCount);
 export function applyProgressiveDisclosureSchema(entry) {
   if (!entry || !entry.category) {
     throw new Error("Invalid entry provided for schema mapping");
@@ -606,3 +660,167 @@ export function applyProgressiveDisclosureSchema(entry) {
   };
 }
 
+
+
+/**
+ * Issue #22: Context Search and Filtering Interface Data Models
+ * Filters a collection of entries based on query parameters
+ */
+export function filterNotebookEntries(entries = [], filters = {}) {
+  const { category, appId, searchValue } = filters;
+
+  return entries.filter((entry) => {
+    if (!entry) return false;
+
+    // 1. Filter by category if specified
+    if (category && entry.category?.toLowerCase() !== category.toLowerCase()) {
+      return false;
+    }
+
+    // 2. Filter by specific app source identifier
+    if (appId) {
+      const hasMatchingSource = entry.sources?.some(s => s.app_id === appId);
+      if (!hasMatchingSource) return false;
+    }
+
+    // 3. Search deeply inside value fields
+    if (searchValue) {
+      const query = searchValue.toLowerCase();
+      const matchString = JSON.stringify(entry.value || {}).toLowerCase();
+      const matchId = (entry.entry_id || "").toLowerCase();
+      
+      if (!matchString.includes(query) && !matchId.includes(query)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+}
+
+/**
+ * Issue #21: Multi-Profile Identity Switcher Data Formats
+ * Validates switching target namespaces for active user profiles
+ */
+export function switchProfileNamespace(currentProfiles = [], targetProfileId) {
+  const profileExists = currentProfiles.find(p => p.profileId === targetProfileId);
+  
+  if (!profileExists) {
+    throw new Error(`Target profile identity namespace '${targetProfileId}' not found.`);
+  }
+
+  return {
+    activeProfileId: profileExists.profileId,
+    namespace: profileExists.namespace || "global",
+    scopeRules: profileExists.scopeRules || { isolationLevel: "strict" },
+    switchedAt: new Date().toISOString()
+
+
+
+/**
+ * Issue #28: Dynamic Context Summary Cards for Quick Review
+ * Formats context updates into structured human-readable text cards.
+ */
+export function generateContextSummaryCard(entry) {
+  if (!entry || !entry.entry_id) {
+    throw new Error("Invalid entry provided for generating summary cards");
+  }
+
+  const category = entry.category || "unknown";
+  const sourceName = entry.sources?.[0]?.name || "System Core";
+  const timestamp = entry.updated_at || entry.created_at || new Date().toISOString();
+  
+  // Condense the value keys into a human-readable list string
+  const modifiedFields = entry.value && typeof entry.value === "object" 
+    ? Object.keys(entry.value).join(", ") 
+    : "no payload fields";
+
+  const cardTitle = `Update in [${category.toUpperCase()}] via ${sourceName}`;
+  const cardBody = `Entry ID: ${entry.entry_id} updated key variables: [${modifiedFields}].`;
+  const footerTimestamp = new Date(timestamp).toLocaleString();
+
+  return {
+    cardId: `card_${entry.entry_id}_${Math.random().toString(36).slice(2, 6)}`,
+    layoutType: "SUMMARY_CARD",
+    displaySchema: {
+      title: cardTitle,
+      body: cardBody,
+      footer: `Refreshed on: ${footerTimestamp}`,
+      badgeStyle: entry.status === "critical" ? "danger" : "info"
+
+
+/**
+ * Issue #30: Interactive Onboarding Flow for Context Settings
+ * Generates configuration steps and default preference presets for onboarding flows.
+ */
+export function generateOnboardingFlowConfig() {
+  return {
+    flowId: "onboarding_context_v1",
+    totalSteps: 3,
+    defaultPresets: {
+      defaultVisibility: "private",
+      globalMemoryDecay: "stable",
+      autoSyncApps: true,
+      allowProgressiveDisclosure: true
+    },
+    steps: [
+      {
+        stepNumber: 1,
+        stepKey: "PRIVACY_CONFIG",
+        title: "Configure Context Privacy",
+        description: "Choose how your application memory is stored. By default, entries remain strictly private.",
+        options: [
+          { value: "private", label: "Strictly Private (Local-First)", selected: true },
+          { value: "public", label: "Shared/Public Context Block", selected: false }
+        ]
+      },
+      {
+        stepNumber: 2,
+        stepKey: "DECAY_PREFERENCE",
+        title: "Memory Persistence Levels",
+        description: "Define how long peripheral context claims persist before experiencing memory decay.",
+        options: [
+          { value: "stable", label: "Persistent (No Expiration)", selected: true },
+          { value: "ephemeral", label: "Fading Context (30-day decay window)", selected: false }
+        ]
+      },
+      {
+        stepNumber: 3,
+        stepKey: "APP_INTEGRATIONS",
+        title: "Authorized Source Connections",
+        description: "Enable automatic protocol contribution updates from authorized internal applications.",
+        options: [
+          { value: "auto_approve", label: "Auto-Accept Claims", selected: false },
+          { value: "manual_review", label: "Review via Inbox Wizard", selected: true }
+        ]
+      }
+    ]
+  };
+}
+
+
+/**
+ * Issue #31: UI Specifications for Context Modification History Logs
+ * Transforms raw modification timelines into structured row data for UI tables.
+ */
+export function formatModificationHistoryLogs(entry) {
+  if (!entry || !Array.isArray(entry.history)) {
+    return [];
+  }
+
+  return entry.history.map((log, index) => {
+    return {
+      rowId: `log_${entry.entry_id || "entry"}_${index}`,
+      timestamp: log.timestamp || new Date().toISOString(),
+      appName: log.app_id || log.source_name || "System Core",
+      modifiedField: log.field || "all_fields",
+      changes: {
+        previousValue: log.old_value !== undefined ? log.old_value : null,
+        newValue: log.new_value !== undefined ? log.new_value : null,
+        actionType: log.action || "UPDATE"
+      }
+    };
+  });
+}
+
+}
