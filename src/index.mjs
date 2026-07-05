@@ -8,6 +8,7 @@ export {
   deleteEntry,
   editEntry,
   explainWhyEntryExists,
+  exportEvidenceChainGraph, 
   filterPublicEntries,
   generateAmbiguityResolutionPrompt,
   getInboxStats,
